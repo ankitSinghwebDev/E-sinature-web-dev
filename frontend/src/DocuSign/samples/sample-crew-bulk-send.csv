@@ -1,0 +1,16 @@
+name,email,role,day_rate,start_date,end_date,department
+Ankit Sharma,ankit.sharma@example.com,Director of Photography,2200,2026-06-01,2026-08-15,Camera
+Maria Chen,maria.chen@example.com,Gaffer,1450,2026-06-01,2026-08-15,Lighting
+James Wilson,james.wilson@example.com,Sound Mixer,1300,2026-06-01,2026-08-15,Sound
+Priya Patel,priya.patel@example.com,1st AC,1100,2026-06-01,2026-08-15,Camera
+Marcus Johnson,marcus.j@example.com,Key Grip,1400,2026-06-01,2026-08-15,Grip
+Sofia Rossi,sofia.rossi@example.com,Production Designer,2000,2026-05-15,2026-08-22,Art
+Tom Becker,tom.becker@example.com,Best Boy Electric,1100,2026-06-01,2026-08-15,Lighting
+Aisha Khan,aisha.khan@example.com,Boom Operator,1050,2026-06-01,2026-08-15,Sound
+Diego Morales,diego.morales@example.com,Steadicam Op,1800,2026-06-15,2026-07-30,Camera
+Hana Yamamoto,hana.y@example.com,Costume Designer,1700,2026-05-15,2026-08-22,Costume
+Liam O'Brien,liam.obrien@example.com,Script Supervisor,1200,2026-06-01,2026-08-15,Script
+Zoe Anderson,zoe.anderson@example.com,Hair Stylist,950,2026-06-01,2026-08-15,Hair & Makeup
+"Smith, John",john.smith@example.com,Stunt Coordinator,2100,2026-06-15,2026-07-15,Stunts
+James Walsh,not-an-email,VFX Supervisor,2500,2026-06-01,2026-09-30,VFX
+,backup-grip@example.com,2nd Grip,900,2026-06-01,2026-08-15,Grip

@@ -48,8 +48,11 @@ import {
   sendDocuSignEnvelope,
   updateDocuSignEnvelope,
 } from '../store/store'
+import BulkJobsView from './BulkJobsView'
+import BulkSendModal from './BulkSendModal'
 import DocumentFieldPlacer from './DocumentFieldPlacer'
 import EnvelopeStatusTracker from './EnvelopeStatusTracker'
+import TemplateLibrary from './TemplateLibrary'
 import * as dsApi from './api'
 import { uploadFile } from '../api/upload'
 import { getFileData } from '../_shims/uploadedFilesOnAWS'
@@ -152,7 +155,7 @@ const EnvelopeTable = ({ rows, isLoading, onSelect, emptyText }) => {
   )
 }
 
-const EnvelopeList = ({ onSelect, onCreate, user }) => {
+const EnvelopeList = ({ onSelect, onCreate, onUseTemplate, user }) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { envelopes: apiEnvelopes, isLoading } = useSelector((s) => s.docusign)
@@ -240,6 +243,9 @@ const EnvelopeList = ({ onSelect, onCreate, user }) => {
     await dispatch(fetchDocuSignEnvelopes())
     setRefreshing(false)
   }
+
+  // Template selected for Bulk Send — opens BulkSendModal when truthy.
+  const [bulkSendTemplate, setBulkSendTemplate] = useState(null)
 
   return (
     <div className="relative">
@@ -451,7 +457,37 @@ const EnvelopeList = ({ onSelect, onCreate, user }) => {
               <EnvelopeTable rows={searchFilter(rejectedEnvelopes)} isLoading={isLoading} onSelect={onSelect} emptyText="No rejected envelopes" />
             ),
           },
+          {
+            key: 'templates',
+            label: <span className="font-semibold">Templates</span>,
+            children: (
+              <div style={{ height: 'calc(100vh - 220px)' }}>
+                <TemplateLibrary
+                  onUseTemplate={onUseTemplate}
+                  onBulkSend={(tpl) => setBulkSendTemplate(tpl)}
+                  canPost
+                />
+              </div>
+            ),
+          },
+          {
+            key: 'bulk-jobs',
+            label: <span className="font-semibold">Bulk Jobs</span>,
+            children: (
+              <div style={{ height: 'calc(100vh - 220px)' }}>
+                <BulkJobsView />
+              </div>
+            ),
+          },
         ]}
+      />
+
+      {/* Bulk Send modal — opened from a template's Bulk Send button */}
+      <BulkSendModal
+        open={!!bulkSendTemplate}
+        template={bulkSendTemplate}
+        onCancel={() => setBulkSendTemplate(null)}
+        onJobStarted={() => setBulkSendTemplate(null)}
       />
     </div>
   )
@@ -1845,6 +1881,14 @@ const DocuSignPanel = () => {
     setSelected(env)
     setView(env.status === 'draft' ? 'edit' : 'detail')
   }
+  // Instantiated template payload → open editor as a fresh draft. The
+  // backend returns an envelope-shaped object without an _id, so the
+  // editor falls into its "new envelope" path and dispatches
+  // createDocuSignEnvelope on save.
+  const handleUseTemplate = (draftPayload) => {
+    setSelected(draftPayload || null)
+    setView('edit')
+  }
   const back = () => { setView('list'); setSelected(null) }
 
   // User side — show only documents sent to them
@@ -1857,7 +1901,12 @@ const DocuSignPanel = () => {
     <AnimatePresence mode="wait">
       {view === 'list' && (
         <motion.div key="list" {...pageTransition}>
-          <EnvelopeList onSelect={handleSelect} onCreate={() => { setSelected(null); setView('edit') }} user={user} />
+          <EnvelopeList
+            onSelect={handleSelect}
+            onCreate={() => { setSelected(null); setView('edit') }}
+            onUseTemplate={handleUseTemplate}
+            user={user}
+          />
         </motion.div>
       )}
       {view === 'edit' && (

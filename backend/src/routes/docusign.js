@@ -2,6 +2,8 @@ const express = require('express')
 const router = express.Router()
 const ctrl = require('../controllers/docusignController')
 const savedSigCtrl = require('../controllers/savedSignatureController')
+const tplCtrl = require('../controllers/docusignTemplateController')
+const bulkCtrl = require('../controllers/docusignBulkController')
 const auth = require('../middleware/auth')
 
 // Envelope CRUD
@@ -31,5 +33,19 @@ router.post('/sync-status', auth, ctrl.syncStatuses)
 router.get('/saved-signatures', auth, savedSigCtrl.getSavedSignatures)
 router.post('/saved-signatures', auth, savedSigCtrl.createSavedSignature)
 router.delete('/saved-signatures/:id', auth, savedSigCtrl.deleteSavedSignature)
+
+// ── Templates ──
+router.get('/templates', auth, tplCtrl.list)
+router.post('/templates', auth, tplCtrl.create)
+router.get('/templates/:id', auth, tplCtrl.get)
+router.put('/templates/:id', auth, tplCtrl.update)
+router.delete('/templates/:id', auth, tplCtrl.remove)
+router.post('/templates/:id/instantiate', auth, tplCtrl.instantiate)
+
+// ── Bulk send ──
+router.post('/bulk-send', auth, bulkCtrl.csvUpload, bulkCtrl.startBulkSend)
+router.get('/bulk-jobs', auth, bulkCtrl.list)
+router.get('/bulk-jobs/:id', auth, bulkCtrl.get)
+router.post('/bulk-jobs/:id/retry-failed', auth, bulkCtrl.retryFailed)
 
 module.exports = router

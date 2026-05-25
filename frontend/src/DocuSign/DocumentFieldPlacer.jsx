@@ -5,10 +5,19 @@
  */
 
 import {
+  CalendarOutlined,
+  CheckCircleOutlined,
+  CheckSquareOutlined,
   CloseOutlined,
   DownOutlined,
+  DownSquareOutlined,
   EditOutlined,
+  FieldNumberOutlined,
   FontSizeOutlined,
+  LinkOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  PictureOutlined,
   UserAddOutlined,
 } from '@ant-design/icons'
 import { Checkbox, Divider, Input, Spin, Tag } from 'antd'
@@ -27,10 +36,24 @@ import {
   PAGE_NAV_HIDE_MS,
   PAGE_NAV_INITIAL_HIDE_MS,
 } from './constants'
+import FieldPropertyPanel from './FieldPropertyPanel'
 
+// One row per toolbar-enabled field type from constants.FIELD_TYPES.
+// Icons live here (constants is JS-only — no JSX), so each entry pairs
+// the type's metadata with its picker icon.
 const FIELDS = [
-  { type: 'signHere', label: 'Signature', icon: <EditOutlined />, color: '#E8930C', w: 180, h: 36 },
-  { type: 'initialHere', label: 'Initial', icon: <FontSizeOutlined />, color: '#3b82f6', w: 120, h: 40 },
+  { type: 'signHere',    label: 'Signature', icon: <EditOutlined />,         color: '#E8930C', w: 180, h: 36 },
+  { type: 'initialHere', label: 'Initial',   icon: <FontSizeOutlined />,     color: '#3b82f6', w: 120, h: 40 },
+  { type: 'checkbox',    label: 'Checkbox',  icon: <CheckSquareOutlined />,  color: '#10b981', w: 180, h: 36 },
+  { type: 'radioGroup',  label: 'Radio',     icon: <CheckCircleOutlined />,  color: '#8b5cf6', w: 180, h: 64 },
+  { type: 'dropdown',    label: 'Select',    icon: <DownSquareOutlined />,   color: '#06b6d4', w: 160, h: 32 },
+  { type: 'text',        label: 'Text',      icon: <EditOutlined />,         color: '#f59e0b', w: 150, h: 32 },
+  { type: 'date',        label: 'Date',      icon: <CalendarOutlined />,     color: '#d946ef', w: 130, h: 32 },
+  { type: 'email',       label: 'Email',     icon: <MailOutlined />,         color: '#0ea5e9', w: 180, h: 32 },
+  { type: 'phone',       label: 'Phone',     icon: <PhoneOutlined />,        color: '#14b8a6', w: 150, h: 32 },
+  { type: 'number',      label: 'Number',    icon: <FieldNumberOutlined />,  color: '#ef4444', w: 100, h: 32 },
+  { type: 'url',         label: 'URL',       icon: <LinkOutlined />,         color: '#7c3aed', w: 180, h: 32 },
+  { type: 'image',       label: 'Image',     icon: <PictureOutlined />,      color: '#0891b2', w: 120, h: 120 },
 ]
 
 // Stable per-recipient identifier so we can arm a signer in fast-place mode
@@ -541,6 +564,20 @@ const DocumentFieldPlacer = ({
         {/* Signer/CC cards injected from parent */}
         {sidebarTopContent}
 
+        {/* Per-field property editor — shown when a placed field is selected */}
+        {editIdx !== null && tabs[editIdx] && (
+          <FieldPropertyPanel
+            tab={tabs[editIdx]}
+            tabIndex={editIdx}
+            recipient={recipients?.[tabs[editIdx].recipientIndex]}
+            onChange={(patch) => {
+              onChange(tabs.map((t, i) => (i === editIdx ? { ...t, ...patch } : t)))
+            }}
+            onDelete={() => removeField(editIdx)}
+            onClose={() => setEditIdx(null)}
+          />
+        )}
+
         {/* No recipients warning */}
         {signers.length === 0 && (
           <div className="mb-3 p-2 rounded-md" style={{ border: `1px solid ${PRIMARY}40`, background: `${PRIMARY}08` }}>
@@ -879,16 +916,18 @@ const DocumentFieldPlacer = ({
                       </div>
                     )}
                   </div>
-                  {FIELDS.map((f) => (
-                    <button key={f.type}
-                      onClick={() => placeField(f.type)}
-                      disabled={selectedPopoverSigners.size === 0}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[15px] font-medium transition-all hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                      style={{ color: f.color }}>
-                      <span className="text-lg">{f.icon}</span>
-                      {f.label}
-                    </button>
-                  ))}
+                  <div className="grid grid-cols-2 gap-1">
+                    {FIELDS.map((f) => (
+                      <button key={f.type}
+                        onClick={() => placeField(f.type)}
+                        disabled={selectedPopoverSigners.size === 0}
+                        className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-[14px] font-semibold transition-all hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                        style={{ color: f.color }}>
+                        <span className="text-base">{f.icon}</span>
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
 
                   {/* Initial on all pages — inside popover */}
                   {pageHeights.length > 1 && (

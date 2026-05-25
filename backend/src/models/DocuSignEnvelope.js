@@ -52,6 +52,12 @@ const tabSchema = new mongoose.Schema(
         'dropdown',
         'approve',
         'decline',
+        // First-Five field types — placed via FieldPropertyPanel.
+        'date',
+        'phone',
+        'number',
+        'url',
+        'image',
       ],
       required: true,
     },
@@ -60,6 +66,13 @@ const tabSchema = new mongoose.Schema(
     // Label shown to the signer
     label: { type: String, default: '' },
     required: { type: Boolean, default: true },
+    // Pre-populated value the signer sees. If `locked` is true, the
+    // signer can't change it (read-only). Shape per field type:
+    //   string/date/email/phone/number/url → string
+    //   checkbox                            → boolean (or 'true'/'false')
+    //   radioGroup/dropdown                 → selected options[].option_id
+    defaultValue: { type: mongoose.Schema.Types.Mixed, default: null },
+    locked: { type: Boolean, default: false },
 
     // ── Coordinate-based placement (drag-and-drop) ──
     pageNumber: { type: Number, default: 1 },
@@ -83,7 +96,9 @@ const tabSchema = new mongoose.Schema(
 
     // For text/dropdown fields
     value: { type: String, default: '' },
-    options: [{ type: String }], // dropdown options
+    // Radio/dropdown options. New shape: [{ option_id, label }]. Mixed
+    // type accepts the legacy `[String]` array too for back-compat.
+    options: [mongoose.Schema.Types.Mixed],
 
     // Auto-generated initial (from "Initials on all pages" feature)
     _autoInitial: { type: Boolean, default: false },

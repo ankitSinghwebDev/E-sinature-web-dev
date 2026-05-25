@@ -59,8 +59,10 @@ export default function AppShell() {
         </div>
       </Header>
 
-      <Content style={{ background: '#f8fafc' }}>
-        <DocuSignPanel />
+      <Content style={{ background: '#f8fafc', padding: '24px 32px' }}>
+        <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+          <DocuSignPanel />
+        </div>
       </Content>
     </Layout>
   )
